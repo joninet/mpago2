@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago con MercadoPago</title>
+</head>
+<body>
+    <h1>Realizar pago</h1>
+    <button id="boton-pago">Pagar S/ 100</button>
+
+    <!-- Incluye el SDK de MercadoPago -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script>
+        // Inicializa el SDK con tu Public Key
+        const mp = new MercadoPago('APP_USR-caa87e3f-ab9d-4a1d-8e1c-6ae5b4a02a06'); // Reemplaza TU_PUBLIC_KEY con tu clave pública de MercadoPago
+
+        document.getElementById('boton-pago').addEventListener('click', function () {
+            fetch('/pagar/', {  // Realiza la solicitud al servidor
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Asegúrate de que este encabezado esté correcto
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    // Si se recibe la preferencia, inicializa el checkout
+                    mp.checkout({
+                        preference: {
+                            id: data.id,  // ID de la preferencia
+                        },
+                        autoOpen: true, // Abre automáticamente el popup
+                    });
+                } else {
+                    console.error('Error en la respuesta:', data);
+                    alert('Hubo un problema al procesar el pago.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un error al intentar pagar.');
+            });
+        });
+    </script>
+</body>
+</html>
